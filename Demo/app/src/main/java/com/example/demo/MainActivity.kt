@@ -3,6 +3,7 @@ package com.example.demo
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import androidx.annotation.MainThread
 import io.reactivex.rxjava3.core.Observable
@@ -228,15 +229,67 @@ class MainActivity : AppCompatActivity() {
         val o4: Observable<String> = Observable.just("4", "5", "6")
         Observable.zip(o3, o4, { i: Int, s: String -> "$s$i" })
             .subscribe {
-
+                Log.e(TAG, "onCreate: zip $it")
             }
 
         // combineLatest 用于最近发射的数据项，在原始的Observable中的任意一个发射了数据时侯继续发射一条数据
-        Observable.combineLatest(o3,o4,{int:Int , string :String -> "$string $int"})
+        Observable.combineLatest(o3, o4, { int: Int, string: String -> "$string $int" })
             .subscribe {
-
+                Log.e(TAG, "onCreate: combineLatest $it")
             }
 
+        // 辅助型
+        // delay
+        Observable.create<Long> {
+            val time = System.currentTimeMillis();
+            it.onNext(time)
+        }
+            .delay(3,TimeUnit.SECONDS)
+            .subscribe {
+                val offset = System.currentTimeMillis() - it
+                Log.e(TAG, "onCreate: delay $offset"  )
+            }
+        // do
+        Observable.just(1)
+            .doOnSubscribe { }
+            .doOnNext { }
+            .doAfterNext { }
+            .doOnError { }
+            .doOnDispose { }
+            .doOnComplete { }
+            .doFinally { }
+            .doOnTerminate { }
+            .doAfterTerminate { }
+            .doOnEach { }
+            .subscribe({
+
+            }, {
+
+            }, {
+
+            })
+
+        // subscribeOn observeOn
+
+        // timeout
+
+        // 错误操作
+        // catch
+        // retry
+
+        // 布尔操作符
+        // all
+        // contains
+        // isEmpty
+
+        // 条件
+        // amb
+        // defaultIfEmpty
+
+        // 转换
+        // toList
+        // toSortedList
+        // toMap
 
     }
 }
