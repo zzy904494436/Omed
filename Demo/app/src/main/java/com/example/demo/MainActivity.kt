@@ -15,6 +15,13 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.SingleSubject
 import java.util.concurrent.TimeUnit
 import java.util.function.BiFunction
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+
+import io.reactivex.rxjava3.core.ObservableEmitter
+
+import io.reactivex.rxjava3.core.ObservableOnSubscribe
+import io.reactivex.rxjava3.functions.Consumer
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -249,6 +256,7 @@ class MainActivity : AppCompatActivity() {
                 val offset = System.currentTimeMillis() - it
                 Log.e(TAG, "onCreate: delay $offset"  )
             }
+
         // do
         Observable.just(1)
             .doOnSubscribe { }
@@ -270,8 +278,28 @@ class MainActivity : AppCompatActivity() {
             })
 
         // subscribeOn observeOn
+        Observable.create<Int> {
+            Log.e(TAG, "线程切换: subscribeOn:  ${Thread.currentThread().name}")
+            it.onNext(1)
+            it.onComplete()
+        }
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe{
+                Log.e(TAG, "线程切换: observeOn: ${Thread.currentThread().name}" )
+            }
 
         // timeout
+        Observable.create<Int> {
+            for (i in 0..4){
+                Thread.sleep(100)
+                it.onNext(i)
+            }
+            it.onComplete()
+        }.timeout(200,TimeUnit.MILLISECONDS,Observable.just(10,11,12))
+            .subscribe {
+                Log.e(TAG, "onCreate: timeout $it ")
+            }
 
         // 错误操作
         // catch
